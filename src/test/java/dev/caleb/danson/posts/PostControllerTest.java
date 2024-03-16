@@ -21,7 +21,6 @@ public class PostControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-
     List<Post> posts = new ArrayList<>();
 
     //I specify what i want to run before eachTest
