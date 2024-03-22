@@ -10,5 +10,5 @@ public record Post(
         String title,
         String body,
         @Version
-        String version) {
+        Integer version) {
 }
