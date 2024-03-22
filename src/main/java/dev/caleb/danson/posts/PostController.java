@@ -1,6 +1,7 @@
 package dev.caleb.danson.posts;
 
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,35 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    Post create(@RequestBody @Validated Post post){
+    Post create(@RequestBody @Valid Post post){
         return postRepository.save(post);
     }
+
+    @PutMapping("/{id}")
+    Post update(@PathVariable Integer id, @RequestBody @Valid Post post){
+
+        Optional<Post> exists = postRepository.findById(id);
+        if(exists.isPresent()){
+            //records are simpler because I do not have to use getters and setters
+            Post updated = new Post(
+                    exists.get().id(),
+                    exists.get().userId(),
+                    post.title(),
+                    post.body(),
+                    exists.get().version()
+            );
+
+            return postRepository.save(updated);
+
+        }else{
+            throw new PostNotFoundException();
+        }
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    void delete(@PathVariable Integer id){
+        postRepository.deleteById(id);
+    }
+
 }

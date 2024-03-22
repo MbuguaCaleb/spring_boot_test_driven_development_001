@@ -12,9 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -83,7 +82,6 @@ public class PostControllerTest {
         //i have told my repository,have this date
         when(postRepository.findById(1)).thenReturn(Optional.of(posts.getFirst()));
 
-
         //Right response i expect when i have the data
         var post = posts.get(0);
         //Expected result
@@ -107,7 +105,7 @@ public class PostControllerTest {
     @Test
     void shouldNotFindPostWhenGivenInvalidID() throws Exception {
 
-        when(postRepository.findById(999)).thenThrow(PostNotFoundException.class);
+       when(postRepository.findById(999)).thenThrow(PostNotFoundException.class);
 
         mockMvc.perform(get("/api/posts/999"))
                 .andExpect(status().isNotFound());
@@ -115,7 +113,10 @@ public class PostControllerTest {
 
     @Test
     void shouldCreateNewPostWhenPostIsValid() throws Exception {
+
+        //Think of Test cases like before you have implemented code logic
         var post = new Post(3, 1, "New Post", "Caleb Masters Create", null);
+
         when(postRepository.save(post)).thenReturn(post);
 
         //asserting the JSON
@@ -132,7 +133,73 @@ public class PostControllerTest {
         mockMvc.perform(post("/api/posts")
                         .contentType("application/json")
                         .content(json))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(content().json(json));
+
+    }
+
+    @Test
+    void shouldCreateNewPostWhenPostIsInValid() throws Exception {
+        var post = new Post(3, 1, "", "", null);
+        when(postRepository.save(post)).thenReturn(post);
+
+        //asserting the JSON
+        String json = STR."""
+                {
+                    "id":\{post.id()},
+                    "userId":\{post.userId()},
+                    "title":"\{post.title()}",
+                    "body":"\{post.body()}",
+                    "version": null
+                }
+                """;
+
+        mockMvc.perform(post("/api/posts")
+                        .contentType("application/json")
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    void shouldUpdatePostsWhenGivenValidPosts() throws Exception {
+
+        //I am only mocking the repositries, then finding my input and outPut
+        //When i pass a post with an existing ID to the save method, it updates the POST
+        var updated = new Post(3, 1, "Title Updated", "New Body Updated", 1);
+
+        when(postRepository.findById(1)).thenReturn(Optional.of(posts.getFirst()));
+
+        when(postRepository.save(updated)).thenReturn(updated);
+
+        //asserting the JSON
+        String requestBody = STR."""
+                {
+                    "id":\{updated.id()},
+                    "userId":\{updated.userId()},
+                    "title":"\{updated.title()}",
+                    "body":"\{updated.body()}",
+                    "version": null
+                }
+                """;
+
+        mockMvc.perform(put("/api/posts/1")
+                .contentType("application/json")
+                .content(requestBody))
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    void shouldDeletePostWhenGivenValidID() throws Exception {
+
+        doNothing().when(postRepository).deleteById(1);
+
+        mockMvc.perform(delete("/api/posts/1"))
+                .andExpect(status().isNoContent());
+
+        //make sure delete by id one was called only once
+        verify(postRepository,times(1)).deleteById(1);
     }
 
 }
