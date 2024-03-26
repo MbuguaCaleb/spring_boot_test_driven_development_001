@@ -105,7 +105,7 @@ public class PostControllerTest {
     @Test
     void shouldNotFindPostWhenGivenInvalidID() throws Exception {
 
-       when(postRepository.findById(999)).thenThrow(PostNotFoundException.class);
+        when(postRepository.findById(999)).thenThrow(PostNotFoundException.class);
 
         mockMvc.perform(get("/api/posts/999"))
                 .andExpect(status().isNotFound());
@@ -115,6 +115,7 @@ public class PostControllerTest {
     void shouldCreateNewPostWhenPostIsValid() throws Exception {
 
         //Think of Test cases like before you have implemented code logic
+        //This is my Input
         var post = new Post(3, 1, "New Post", "Caleb Masters Create", null);
 
         when(postRepository.save(post)).thenReturn(post);
@@ -139,9 +140,10 @@ public class PostControllerTest {
     }
 
     @Test
-    void shouldCreateNewPostWhenPostIsInValid() throws Exception {
+    void shouldNotCreateNewPostWhenPostIsInValid() throws Exception {
         var post = new Post(3, 1, "", "", null);
-        when(postRepository.save(post)).thenReturn(post);
+
+        //when(postRepository.save(post)).thenReturn(post);
 
         //asserting the JSON
         String json = STR."""
@@ -164,9 +166,9 @@ public class PostControllerTest {
     @Test
     void shouldUpdatePostsWhenGivenValidPosts() throws Exception {
 
-        //I am only mocking the repositries, then finding my input and outPut
-        //When i pass a post with an existing ID to the save method, it updates the POST
-        var updated = new Post(3, 1, "Title Updated", "New Body Updated", 1);
+        //I am only mocking the repositories, then finding my input and outPut
+        //When i pass a post with an existing ID to the save method; it updates the POST
+        var updated = new Post(1, 1, "Title Updated", "New Body Updated", 1);
 
         when(postRepository.findById(1)).thenReturn(Optional.of(posts.getFirst()));
 
@@ -184,8 +186,8 @@ public class PostControllerTest {
                 """;
 
         mockMvc.perform(put("/api/posts/1")
-                .contentType("application/json")
-                .content(requestBody))
+                        .contentType("application/json")
+                        .content(requestBody))
                 .andExpect(status().isOk());
 
     }
@@ -199,7 +201,7 @@ public class PostControllerTest {
                 .andExpect(status().isNoContent());
 
         //make sure delete by id one was called only once
-        verify(postRepository,times(1)).deleteById(1);
+        verify(postRepository, times(1)).deleteById(1);
     }
 
 }
