@@ -39,7 +39,56 @@ MockMvc mockMvc
 
 ```
 
+**Test containers**
 
+```
+Testcontainers is an open source framework for providing throwaway, 
+lightweight instances of databases, message brokers, web browsers, 
+or just about anything that can run in a Docker container
+```
+
+
+**Spring jdbc & spring jpa**
+
+```
+Libraries that help me in connecting to my database.
+
+We have slice tests for dataJDBC and dataJPA, @DataJdbcTest @DataJDBC
+When testing anything we may have added to repostitories.
+
+Any implementation that i may have added on top of the jdbc /jpa, can be 
+tested as an integration tests.
+
+```
+
+**UnitTests vs Integration Tests**
+```
+Unit testing is independent and can be done in isolation. 
+
+Each unit is tested separately, and external dependencies are typically mocked up. Integration 
+testing, however, depends on the units that are being integrated. 
+
+It requires that all units be tested and functioning correctly before it can be performed.
+
+```
+
+
+**Integration Tests**
+
+```
+When writing integration tests for the repository, we only write tests for what spring boot is not
+already testing, example custom repositories.
+
+Test container enable us use whatever we are using in our production enviroment for our tests as well.
+(For instance we can spin up a postgreSQL container then use it for our Tests)
+
+For instance if i use postgres for my production enviroment yet for my tests i am using H2,there are 
+some errors i may not catch.
+
+Test containers help me introduce a database in my testing.
+
+
+```
 **Notes By**
 
 ```
